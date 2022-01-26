@@ -1,3 +1,4 @@
+#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 """@Author: Vivek Srinivas - Baliga Lab, ISB
 - This is a program to identify hetergeneity in growth.
@@ -48,12 +49,12 @@ from scipy import stats
 ##Initiate analysis
 
 def inittiate_analysis(analysis_dir,scanned_images):
-    if os.path.isdir(analysis_dir):
+    if os.path.exist(analysis_dir):
         pass
     else:
         os.mkdir(analysis_dir)
     s = scanned_images.split("/")[-1]
-    if os.path.isdir(os.path.join(analysis_dir,s)):
+    if os.path.exist(os.path.join(analysis_dir,s)):
         pass
     else:
         os.mkdir(os.path.join(analysis_dir,s))
@@ -106,7 +107,7 @@ def find_plates(parent_dir,scanned_image_folder):
             plate_loc["%s"%(i+1)] = [int(cX),int(cY),550]
             cv2.putText(image_read,"#{}".format(i+1),(int(cX),int(cY)),
                         cv2.FONT_HERSHEY_SIMPLEX,10,(255,255,0),1)
-    cv2.imwrite("%s/Identified_plates.png"%parent_dir)
+    cv2.imwrite("%s/Identified_plates.png"%parent_dir,image_read)
 
     return plate_loc
 
@@ -140,7 +141,7 @@ def crop_image(image_file,folder,circles,names,time):
 
 def crop_plates(folder,out_folder, circles,names):
     cropped_images_path = os.path.join(out_folder,"cropped_images")
-    if os.path.isdir(cropped_images_path):
+    if os.path.exist(cropped_images_path):
         pass
     else:
         os.mkdir(cropped_images_path)
