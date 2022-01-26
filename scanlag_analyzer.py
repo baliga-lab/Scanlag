@@ -1,4 +1,3 @@
-#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 """@Author: Vivek Srinivas - Baliga Lab, ISB
 - This is a program to identify hetergeneity in growth.
@@ -74,7 +73,7 @@ def binarize_image(image):
     return thresh
 
 def mask_image(image,size):
-    labels = measure.label(image,neighbors=8,background=0)
+    labels = measure.label(image,background=0)
     mask = np.zeros(image.shape,dtype="uint8")
     for label in np.unique(labels):
         if label == 0:
