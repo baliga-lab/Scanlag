@@ -48,12 +48,12 @@ from scipy import stats
 ##Initiate analysis
 
 def inittiate_analysis(analysis_dir,scanned_images):
-    if os.path.exist(analysis_dir):
+    if os.path.isdir(analysis_dir):
         pass
     else:
         os.mkdir(analysis_dir)
     s = scanned_images.split("/")[-1]
-    if os.path.exist(os.path.join(analysis_dir,s)):
+    if os.path.isdir(os.path.join(analysis_dir,s)):
         pass
     else:
         os.mkdir(os.path.join(analysis_dir,s))
@@ -140,7 +140,7 @@ def crop_image(image_file,folder,circles,names,time):
 
 def crop_plates(folder,out_folder, circles,names):
     cropped_images_path = os.path.join(out_folder,"cropped_images")
-    if os.path.exist(cropped_images_path):
+    if os.path.isdir(cropped_images_path):
         pass
     else:
         os.mkdir(cropped_images_path)
