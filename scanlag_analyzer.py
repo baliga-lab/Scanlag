@@ -73,7 +73,7 @@ def binarize_image(image):
     return thresh
 
 def mask_image(image,size):
-    labels = measure.label(image,background=0)
+    labels = measure.label(image,background=0,connectivity=2)
     mask = np.zeros(image.shape,dtype="uint8")
     for label in np.unique(labels):
         if label == 0:
