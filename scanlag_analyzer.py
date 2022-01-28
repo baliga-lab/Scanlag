@@ -92,10 +92,10 @@ def find_plates(parent_dir,scanned_image_folder):
     image = os.path.join(scanned_image_folder,os.listdir(scanned_image_folder)[0])
     image_read = cv2.imread(image,0)
     thresh = binarize_image(image)
-    mask = mask_image(thresh,[100000,220000])
+    mask = mask_image(thresh,[1000000,2200000])
     cnts = cv2.findContours(mask.copy(),cv2.RETR_EXTERNAL,
                         cv2.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+    cnts = cnts[0]
     cnts = contours.sort_contours(cnts)[0]
     plate_loc = OrderedDict()
     for (i,c) in enumerate(cnts):
@@ -156,17 +156,17 @@ def crop_plates(folder,out_folder, circles,names):
             pass
     
     for time, img in zip(times,image_paths):
-        crop_image(img,cropped_images_path,list(names_pos.values()),list(names_pos.keys()),int((time-to)/60.0))
+        crop_image(img,cropped_images_path,list(names_pos.values()),list(names_pos.keys()),int((time-t0)/60.0))
 
-    return(cropped_images_path,[max(times)]*len(list(names_pos.items())))
+    return(cropped_images_path,[int((max(times)-t0)/60.0)]*len(list(names_pos.items())))
 
 # Identify CFUs and measure growth
 
-def find_CFUs(image,image2,cell_type, folder):
+def find_CFUs(image,image2,cell_type, parent_dir):
     initial_image = cv2.imread(image2,0)
     cnts = cv2.findContours(image.copy(),cv2.RETR_EXTERNAL,
                             cv2.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+    cnts = cnts[0]
     cnts = contours.sort_contours(cnts)[0]
     crop_rect = OrderedDict()
     spot_loc = OrderedDict()
@@ -179,11 +179,8 @@ def find_CFUs(image,image2,cell_type, folder):
         crop_rect["%s_%s"%(cell_type,i)] = [y,h,x,w]
         cv2.putText(initial_image,"#{}".format(i+1),(x,y-15),
                     cv2.FONT_HERSHEY_SIMPLEX,0.45,(0,255,0),1)
-    try:
-        os.mkdir(folder+"/Annotated")
-    except:
-        pass
-    cv2.imwrite(folder+"/Annotated/%s_annotated.png"%cell_type,initial_image)
+        
+    cv2.imwrite("%s/%s_colonies_identified.png"%(parent_dir,cell_type),initial_image)
     return crop_rect, spot_loc
    
 def find_pixels_in_CFUs(image_f,rects):
@@ -207,16 +204,16 @@ def find_pixels_in_CFUs(image_f,rects):
     return pixels
 
 
-def get_rects(image,cell_type,size, folder):
+def get_rects(image,cell_type,size, parent_dir):
     thresh = binarize_image(image)
     mask = mask_image(thresh,size)
-    return find_CFUs(mask, image, cell_type, folder)
+    return find_CFUs(mask, image, cell_type, parent_dir)
     
 
-def get_growth(folder,cell_types,max_times,size):
+def get_growth(folder,cell_types,max_times,size,parent_dir):
     growth = pd.DataFrame()
     for i, max_time in zip(cell_types,max_times):
-        rects, spot_loc = get_rects("%s/%s_%s.png"%(folder,i,max_time),i,size, folder.split("/")[0])
+        rects, spot_loc = get_rects("%s/%s_%s.png"%(folder,i,max_time),i,size,parent_dir)
         for files in os.listdir(folder):
             cell_type, time = files.split("_")
             if cell_type == i:
